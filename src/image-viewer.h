@@ -38,9 +38,6 @@ public slots:
 signals:
     void imageChanged();
 
-private slots:
-//    void contextMenu(QPoint pos);
-
 private:
     void setMatrix();
     void makeTools();

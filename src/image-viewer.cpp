@@ -19,7 +19,7 @@ ImageViewer::ImageViewer(QString name, QWidget *parent) :
     m_view = new GraphicsView(this);
     m_view->setScene(scene);
 
-    // objet représentant l'image sur le graphique
+    // graphic object holding the image buffer
     m_pixmap = new PixmapItem;
     scene->addItem(m_pixmap);
     connect(m_pixmap, SIGNAL(mouseMoved(int,int)), SLOT(mouseAt(int,int)));
@@ -34,22 +34,21 @@ ImageViewer::ImageViewer(QString name, QWidget *parent) :
     setLayout(box);
 }
 
-// le bandeau avec les boutons et infos
+// toolbar with a few quick actions and display information
 QLayout * ImageViewer::makeToolbar()
 {
-    // affichage du nom et des valeurs au pixel
+    // name and value at pixel
     auto label = new QLabel(m_name, this);
     label->setStyleSheet(QString("QLabel { font-weight: bold; }"));
     m_pixel_value = new QLabel(this);
 
-    // les boutons
     auto fit = new QToolButton(this);
-    fit->setToolTip(tr("Adapte l'image à la taile de la fenêtre"));
+    fit->setToolTip(tr("Fit image to window"));
     fit->setIcon(QIcon(":/icons/zoom-fit-best.png"));
     connect(fit, SIGNAL(clicked()), SLOT(zoomFit()));
 
     auto orig = new QToolButton(this);
-    orig->setToolTip(tr("Affiche l'image en taille réelle"));
+    orig->setToolTip(tr("Resize image to its original size"));
     orig->setIcon(QIcon(":/icons/zoom-original.png"));
     connect(orig, SIGNAL(clicked()), SLOT(zoomOriginal()));
 
