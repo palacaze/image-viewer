@@ -126,7 +126,7 @@ void GraphicsView::wheelEvent(QWheelEvent *event) {
     if (event->modifiers() == Qt::NoModifier) {
         if (event->delta() > 0)
             m_viewer->zoomIn(3);
-        else
+        else if (event->delta() < 0)
             m_viewer->zoomOut(3);
         event->accept();
     }
