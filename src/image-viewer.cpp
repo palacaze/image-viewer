@@ -68,6 +68,7 @@ ImageViewer::ImageViewer(QWidget *parent)
     : QFrame(parent)
     , m_zoom_level(0)
     , m_fit(true)
+    , m_bar_mode(ToolBarMode::Visible)
 {
     auto scene = new QGraphicsScene(this);
     m_view = new GraphicsView(this);
@@ -144,6 +145,20 @@ PixmapItem *ImageViewer::pixmapItem() {
     return m_pixmap;
 }
 
+ImageViewer::ToolBarMode ImageViewer::toolBarMode() const {
+    return m_bar_mode;
+}
+
+void ImageViewer::setToolBarMode(ToolBarMode mode) {
+    m_bar_mode = mode;
+    if (mode == ToolBarMode::Hidden)
+        m_toolbar->hide();
+    else if (mode == ToolBarMode::Visible)
+        m_toolbar->show();
+    else
+        m_toolbar->setVisible(underMouse());
+}
+
 void ImageViewer::addTool(QWidget *tool) {
     m_toolbar->layout()->addWidget(tool);
 }
@@ -192,6 +207,24 @@ void ImageViewer::mouseAt(int x, int y) {
     }
     else
         m_pixel_value->setText(QString());
+}
+
+void ImageViewer::enterEvent(QEvent *event) {
+    QFrame::enterEvent(event);
+    if (m_bar_mode == ToolBarMode::AutoHidden) {
+        m_toolbar->show();
+        if (m_fit)
+            zoomFit();
+    }
+}
+
+void ImageViewer::leaveEvent(QEvent *event) {
+    QFrame::leaveEvent(event);
+    if (m_bar_mode == ToolBarMode::AutoHidden) {
+        m_toolbar->hide();
+        if (m_fit)
+            zoomFit();
+    }
 }
 
 void ImageViewer::resizeEvent(QResizeEvent *event) {

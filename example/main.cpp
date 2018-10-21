@@ -19,6 +19,7 @@ public:
         // viewer
         auto viewer = new pal::ImageViewer(this);
         viewer->setText("A test viewer");
+        viewer->setToolBarMode(pal::ImageViewer::ToolBarMode::AutoHidden);
 
         // selection tool
         auto selecter = new pal::SelectionItem(viewer->pixmapItem());

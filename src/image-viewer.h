@@ -21,6 +21,16 @@ class IMAGE_VIEWER_PUBLIC ImageViewer : public QFrame {
     Q_OBJECT
 
 public:
+    /**
+     * ToolBar visibility
+     */
+    enum class ToolBarMode {
+        Visible,
+        Hidden,
+        AutoHidden
+    };
+
+public:
     explicit ImageViewer(QWidget *parent = nullptr);
 
     /// Text displayed on the left side of the toolbar
@@ -35,6 +45,10 @@ public:
 
     /// Add a tool to the toolbar
     void addTool(QWidget *tool);
+
+    /// Toolbar visibility
+    ToolBarMode toolBarMode() const;
+    void setToolBarMode(ToolBarMode mode);
 
 public slots:
     void setText(const QString &txt);
@@ -51,6 +65,8 @@ signals:
     void zoomChanged(double scale);
 
 protected:
+    void enterEvent(QEvent *event) override;
+    void leaveEvent(QEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
     void showEvent(QShowEvent *event) override;
 
@@ -66,6 +82,7 @@ private:
     PixmapItem *m_pixmap;
     QWidget *m_toolbar;
     bool m_fit;
+    ToolBarMode m_bar_mode;
 };
 
 
