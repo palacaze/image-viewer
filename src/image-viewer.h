@@ -50,6 +50,10 @@ public:
     ToolBarMode toolBarMode() const;
     void setToolBarMode(ToolBarMode mode);
 
+    /// Anti-aliasing
+    bool isAntialiasingEnabled() const;
+    void enableAntialiasing(bool on = true);
+
 public slots:
     void setText(const QString &txt);
     void setImage(const QImage &);

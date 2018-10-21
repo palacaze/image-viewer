@@ -159,6 +159,14 @@ void ImageViewer::setToolBarMode(ToolBarMode mode) {
         m_toolbar->setVisible(underMouse());
 }
 
+bool ImageViewer::isAntialiasingEnabled() const {
+    return m_view->renderHints() & QPainter::Antialiasing;
+}
+
+void ImageViewer::enableAntialiasing(bool on) {
+    m_view->setRenderHint(QPainter::Antialiasing, on);
+}
+
 void ImageViewer::addTool(QWidget *tool) {
     m_toolbar->layout()->addWidget(tool);
 }
