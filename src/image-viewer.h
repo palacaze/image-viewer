@@ -16,19 +16,24 @@ class PixmapItem;
 class GraphicsView;
 
 /**
- * @brief ImageViewer Affiche des images dans un widget graphique qui propose
- * en complément un certain nombre d'outils pour exploiter les images.
- *
- * Ne pas utiliser directement, faire appel à ImageViewerNode à la place
+ * @brief ImageViewer displays images and allows basic interaction with it
  */
 class IMAGE_VIEWER_PUBLIC ImageViewer : public QFrame {
     Q_OBJECT
 
 public:
-    explicit ImageViewer(QString name, QWidget *parent = nullptr);
+    explicit ImageViewer(QWidget *parent = nullptr);
+
+    /// Text displayed on the left side of the toolbar
+    QString text() const;
+
+    /// The currently displayed image
+    const QImage& image() const;
 
 public slots:
+    void setText(const QString &txt);
     void setImage(const QImage &);
+
     void zoomFit();
     void zoomOriginal();
     void zoomIn(int level = 1);
@@ -45,7 +50,7 @@ private:
 
 private:
     int m_zoom_level;
-    QString m_name;
+    QLabel *m_text_label;
     QLabel *m_pixel_value;
     GraphicsView *m_view;
     PixmapItem *m_pixmap;

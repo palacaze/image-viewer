@@ -12,8 +12,9 @@
 
 namespace pal {
 
-ImageViewer::ImageViewer(QString name, QWidget *parent) :
-    QFrame(parent), m_zoom_level(0), m_name(name)
+ImageViewer::ImageViewer(QWidget *parent)
+    : QFrame(parent)
+    , m_zoom_level(0)
 {
     auto scene = new QGraphicsScene(this);
     m_view = new GraphicsView(this);
@@ -35,11 +36,10 @@ ImageViewer::ImageViewer(QString name, QWidget *parent) :
 }
 
 // toolbar with a few quick actions and display information
-QLayout * ImageViewer::makeToolbar()
-{
-    // name and value at pixel
-    auto label = new QLabel(m_name, this);
-    label->setStyleSheet(QString("QLabel { font-weight: bold; }"));
+QLayout * ImageViewer::makeToolbar() {
+    // text and value at pixel
+    m_text_label = new QLabel(this);
+    m_text_label->setStyleSheet(QString("QLabel { font-weight: bold; }"));
     m_pixel_value = new QLabel(this);
 
     auto fit = new QToolButton(this);
@@ -54,12 +54,24 @@ QLayout * ImageViewer::makeToolbar()
 
     auto hbox = new QHBoxLayout;
     hbox->setContentsMargins(0,0,0,0);
-    hbox->addWidget(label);
+    hbox->addWidget(m_text_label);
     hbox->addStretch(1);
     hbox->addWidget(m_pixel_value);
     hbox->addWidget(fit);
     hbox->addWidget(orig);
     return hbox;
+}
+
+QString ImageViewer::text() const {
+    return m_text_label->text();
+}
+
+void ImageViewer::setText(const QString &txt) {
+    m_text_label->setText(txt);
+}
+
+const QImage &ImageViewer::image() const {
+    return m_pixmap->image();
 }
 
 void ImageViewer::setImage(const QImage &im) {

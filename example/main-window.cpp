@@ -9,7 +9,8 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    auto viewer = new pal::ImageViewer("A test viewer", this);
+    auto viewer = new pal::ImageViewer(this);
+    viewer->setText("A test viewer");
 
     QList<QByteArray> formats = QImageReader::supportedImageFormats();
     QStringList list;
