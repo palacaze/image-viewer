@@ -2,7 +2,6 @@
 #define IMAGEVIEWER_H
 
 #include <QFrame>
-#include <QGraphicsView>
 #include <QGraphicsPixmapItem>
 #include "image-viewer-global.h"
 
@@ -54,22 +53,6 @@ private:
     QLabel *m_pixel_value;
     GraphicsView *m_view;
     PixmapItem *m_pixmap;
-};
-
-
-class IMAGE_VIEWER_PUBLIC GraphicsView : public QGraphicsView {
-    Q_OBJECT
-public:
-    explicit GraphicsView(ImageViewer *viewer);
-
-protected:
-    void wheelEvent(QWheelEvent *) override;
-    void enterEvent(QEvent *event) override;
-    void mousePressEvent(QMouseEvent *) override;
-    void mouseReleaseEvent(QMouseEvent *) override;
-
-private:
-    ImageViewer *m_viewer;
 };
 
 

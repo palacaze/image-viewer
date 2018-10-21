@@ -12,6 +12,56 @@
 
 namespace pal {
 
+// Graphics View with better mouse events handling
+class GraphicsView : public QGraphicsView {
+    Q_OBJECT
+public:
+    explicit GraphicsView(ImageViewer *viewer)
+        : QGraphicsView()
+        , m_viewer(viewer)
+    {
+        // no antialiasing or filtering, we want to see the exact image content
+        setRenderHint(QPainter::Antialiasing, false);
+        setDragMode(QGraphicsView::ScrollHandDrag);
+        setOptimizationFlags(QGraphicsView::DontSavePainterState);
+        setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
+        setTransformationAnchor(QGraphicsView::AnchorUnderMouse); // zoom at cursor position
+        setInteractive(true);
+        setMouseTracking(true);
+    }
+
+protected:
+    void wheelEvent(QWheelEvent *event) override {
+        if (event->modifiers() == Qt::NoModifier) {
+            if (event->delta() > 0)
+                m_viewer->zoomIn(3);
+            else if (event->delta() < 0)
+                m_viewer->zoomOut(3);
+            event->accept();
+        }
+        else
+            QGraphicsView::wheelEvent(event);
+    }
+
+    void enterEvent(QEvent *event) override {
+        QGraphicsView::enterEvent(event);
+        viewport()->setCursor(Qt::CrossCursor);
+    }
+
+    void mousePressEvent(QMouseEvent *event) override {
+        QGraphicsView::mousePressEvent(event);
+    }
+
+    void mouseReleaseEvent(QMouseEvent *event) override {
+        QGraphicsView::mouseReleaseEvent(event);
+        viewport()->setCursor(Qt::CrossCursor);
+    }
+
+private:
+    ImageViewer *m_viewer;
+};
+
+
 ImageViewer::ImageViewer(QWidget *parent)
     : QFrame(parent)
     , m_zoom_level(0)
@@ -90,7 +140,7 @@ void ImageViewer::setMatrix() {
 
 void ImageViewer::zoomFit() {
     m_view->fitInView(m_pixmap, Qt::KeepAspectRatio);
-    m_zoom_level = 10* std::log2f(m_view->matrix().m11());
+    m_zoom_level = int(10.0 * std::log2(m_view->matrix().m11()));
 }
 
 void ImageViewer::zoomOriginal() {
@@ -117,47 +167,6 @@ void ImageViewer::mouseAt(int x, int y) {
     }
     else
         m_pixel_value->setText(QString());
-}
-
-
-// derive QGraphics View for better mouse events handling
-GraphicsView::GraphicsView(ImageViewer *viewer) :
-    QGraphicsView(), m_viewer(viewer)
-{
-    // no antialiasing or filtering, we want to see the exact image content
-    setRenderHint(QPainter::Antialiasing, false);
-    setDragMode(QGraphicsView::ScrollHandDrag);
-    setOptimizationFlags(QGraphicsView::DontSavePainterState);
-    setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
-    setTransformationAnchor(QGraphicsView::AnchorUnderMouse); // zoom at cursor position
-    setInteractive(true);
-    setMouseTracking(true);
-}
-
-void GraphicsView::wheelEvent(QWheelEvent *event) {
-    if (event->modifiers() == Qt::NoModifier) {
-        if (event->delta() > 0)
-            m_viewer->zoomIn(3);
-        else if (event->delta() < 0)
-            m_viewer->zoomOut(3);
-        event->accept();
-    }
-    else
-        QGraphicsView::wheelEvent(event);
-}
-
-void GraphicsView::enterEvent(QEvent *event) {
-    QGraphicsView::enterEvent(event);
-    viewport()->setCursor(Qt::CrossCursor);
-}
-
-void GraphicsView::mousePressEvent(QMouseEvent *event) {
-    QGraphicsView::mousePressEvent(event);
-}
-
-void GraphicsView::mouseReleaseEvent(QMouseEvent *event) {
-    QGraphicsView::mouseReleaseEvent(event);
-    viewport()->setCursor(Qt::CrossCursor);
 }
 
 
@@ -192,8 +201,10 @@ void PixmapItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
 
 void PixmapItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
     auto pos = event->pos();
-    emit mouseMoved(pos.x(), pos.y());
+    emit mouseMoved(int(pos.x()), int(pos.y()));
     QGraphicsItem::hoverMoveEvent(event);
 }
 
 } // namespace pal
+
+#include "image-viewer.moc"

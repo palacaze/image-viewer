@@ -1,5 +1,4 @@
 add_executable(viewer-example
-    main-window.cpp
     main.cpp
 )
 
