@@ -29,6 +29,13 @@ public:
     /// The currently displayed image
     const QImage& image() const;
 
+    /// Access to the pixmap so that other tools can add things to it
+    const PixmapItem* pixmapItem() const;
+    PixmapItem* pixmapItem();
+
+    /// Add a tool to the toolbar
+    void addTool(QWidget *tool);
+
 public slots:
     void setText(const QString &txt);
     void setImage(const QImage &);
@@ -41,11 +48,11 @@ public slots:
 
 signals:
     void imageChanged();
+    void zoomChanged(double scale);
 
 private:
     void setMatrix();
-    void makeTools();
-    QLayout * makeToolbar();
+    void makeToolbar();
 
 private:
     int m_zoom_level;
@@ -53,6 +60,7 @@ private:
     QLabel *m_pixel_value;
     GraphicsView *m_view;
     PixmapItem *m_pixmap;
+    QWidget *m_toolbar;
 };
 
 

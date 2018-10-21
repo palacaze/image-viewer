@@ -1,5 +1,7 @@
 add_executable(viewer-example
     main.cpp
+    rect-selection.cpp
+    rect-selection.h
 )
 
 pal_set_exe_properties(viewer-example)

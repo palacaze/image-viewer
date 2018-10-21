@@ -75,18 +75,17 @@ ImageViewer::ImageViewer(QWidget *parent)
     scene->addItem(m_pixmap);
     connect(m_pixmap, SIGNAL(mouseMoved(int,int)), SLOT(mouseAt(int,int)));
 
-    auto layout = makeToolbar();
+    makeToolbar();
 
     auto box = new QVBoxLayout;
-    box->addLayout(layout);
     box->setContentsMargins(5,0,5,0);
+    box->addWidget(m_toolbar);
     box->addWidget(m_view, 1);
-
     setLayout(box);
 }
 
 // toolbar with a few quick actions and display information
-QLayout * ImageViewer::makeToolbar() {
+void ImageViewer::makeToolbar() {
     // text and value at pixel
     m_text_label = new QLabel(this);
     m_text_label->setStyleSheet(QString("QLabel { font-weight: bold; }"));
@@ -102,14 +101,15 @@ QLayout * ImageViewer::makeToolbar() {
     orig->setIcon(QIcon(":/icons/zoom-original.png"));
     connect(orig, SIGNAL(clicked()), SLOT(zoomOriginal()));
 
-    auto hbox = new QHBoxLayout;
-    hbox->setContentsMargins(0,0,0,0);
-    hbox->addWidget(m_text_label);
-    hbox->addStretch(1);
-    hbox->addWidget(m_pixel_value);
-    hbox->addWidget(fit);
-    hbox->addWidget(orig);
-    return hbox;
+    m_toolbar = new QWidget;
+    auto box = new QHBoxLayout(m_toolbar);
+    m_toolbar->setContentsMargins(0,0,0,0);
+    box->setContentsMargins(0,0,0,0);
+    box->addWidget(m_text_label);
+    box->addStretch(1);
+    box->addWidget(m_pixel_value);
+    box->addWidget(fit);
+    box->addWidget(orig);
 }
 
 QString ImageViewer::text() const {
@@ -129,6 +129,18 @@ void ImageViewer::setImage(const QImage &im) {
     emit imageChanged();
 }
 
+const PixmapItem *ImageViewer::pixmapItem() const {
+    return m_pixmap;
+}
+
+PixmapItem *ImageViewer::pixmapItem() {
+    return m_pixmap;
+}
+
+void ImageViewer::addTool(QWidget *tool) {
+    m_toolbar->layout()->addWidget(tool);
+}
+
 void ImageViewer::setMatrix() {
     qreal scale = std::pow(2.0, m_zoom_level / 10.0);
 
@@ -136,11 +148,13 @@ void ImageViewer::setMatrix() {
     matrix.scale(scale, scale);
 
     m_view->setMatrix(matrix);
+    emit zoomChanged(m_view->matrix().m11());
 }
 
 void ImageViewer::zoomFit() {
     m_view->fitInView(m_pixmap, Qt::KeepAspectRatio);
     m_zoom_level = int(10.0 * std::log2(m_view->matrix().m11()));
+    emit zoomChanged(m_view->matrix().m11());
 }
 
 void ImageViewer::zoomOriginal() {
