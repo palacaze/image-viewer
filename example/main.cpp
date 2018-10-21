@@ -64,6 +64,7 @@ public:
         file_menu->addAction(open_action);
 
         setCentralWidget(viewer);
+        resize(800, 600);
     }
 
     ~MainWindow() = default;

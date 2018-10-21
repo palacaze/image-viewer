@@ -26,6 +26,8 @@ public:
         setOptimizationFlags(QGraphicsView::DontSavePainterState);
         setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
         setTransformationAnchor(QGraphicsView::AnchorUnderMouse); // zoom at cursor position
+        setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         setInteractive(true);
         setMouseTracking(true);
     }
@@ -65,6 +67,7 @@ private:
 ImageViewer::ImageViewer(QWidget *parent)
     : QFrame(parent)
     , m_zoom_level(0)
+    , m_fit(true)
 {
     auto scene = new QGraphicsScene(this);
     m_view = new GraphicsView(this);
@@ -126,6 +129,10 @@ const QImage &ImageViewer::image() const {
 
 void ImageViewer::setImage(const QImage &im) {
     m_pixmap->setImage(im);
+
+    if (m_fit)
+        zoomFit();
+
     emit imageChanged();
 }
 
@@ -154,21 +161,25 @@ void ImageViewer::setMatrix() {
 void ImageViewer::zoomFit() {
     m_view->fitInView(m_pixmap, Qt::KeepAspectRatio);
     m_zoom_level = int(10.0 * std::log2(m_view->matrix().m11()));
+    m_fit = true;
     emit zoomChanged(m_view->matrix().m11());
 }
 
 void ImageViewer::zoomOriginal() {
     m_zoom_level = 0;
+    m_fit = false;
     setMatrix();
 }
 
 void ImageViewer::zoomIn(int level) {
     m_zoom_level += level;
+    m_fit = false;
     setMatrix();
 }
 
 void ImageViewer::zoomOut(int level) {
     m_zoom_level -= level;
+    m_fit = false;
     setMatrix();
 }
 
@@ -181,6 +192,18 @@ void ImageViewer::mouseAt(int x, int y) {
     }
     else
         m_pixel_value->setText(QString());
+}
+
+void ImageViewer::resizeEvent(QResizeEvent *event) {
+    QFrame::resizeEvent(event);
+    if (m_fit)
+        zoomFit();
+}
+
+void ImageViewer::showEvent(QShowEvent *event) {
+    QFrame::showEvent(event);
+    if (m_fit)
+        zoomFit();
 }
 
 

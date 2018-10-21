@@ -50,6 +50,10 @@ signals:
     void imageChanged();
     void zoomChanged(double scale);
 
+protected:
+    void resizeEvent(QResizeEvent *event) override;
+    void showEvent(QShowEvent *event) override;
+
 private:
     void setMatrix();
     void makeToolbar();
@@ -61,6 +65,7 @@ private:
     GraphicsView *m_view;
     PixmapItem *m_pixmap;
     QWidget *m_toolbar;
+    bool m_fit;
 };
 
 
