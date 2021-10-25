@@ -6,6 +6,7 @@
 #include "image-viewer-global.h"
 
 QT_BEGIN_NAMESPACE
+class QGraphicsView;
 class QLabel;
 QT_END_NAMESPACE
 
@@ -54,6 +55,9 @@ public:
     bool isAntialiasingEnabled() const;
     void enableAntialiasing(bool on = true);
 
+    /// QGraphicsView control
+    QGraphicsView* view() const;
+
 public slots:
     void setText(const QString &txt);
     void setImage(const QImage &);
@@ -63,6 +67,9 @@ public slots:
     void zoomIn(int level = 1);
     void zoomOut(int level = 1);
     void mouseAt(int x, int y);
+
+private slots:
+    void updateSceneRect(int w, int h);
 
 signals:
     void imageChanged();

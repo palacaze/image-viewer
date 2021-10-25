@@ -6,6 +6,7 @@
 #include <QAction>
 #include <QFileDialog>
 #include <QImageReader>
+#include <QGraphicsView>
 #include "image-viewer.h"
 #include "rect-selection.h"
 
@@ -63,6 +64,27 @@ public:
 
         auto file_menu = menuBar()->addMenu(tr("&File"));
         file_menu->addAction(open_action);
+
+        auto scrollbar_actions = new QActionGroup(this);
+        scrollbar_actions->setExclusive(true);
+
+        auto scrollbar_menu = menuBar()->addMenu(tr("&Scroll bars"));
+        using ScrollBarPolicyMenuItem = std::pair<QString, Qt::ScrollBarPolicy>;
+        for (auto item : {
+                 ScrollBarPolicyMenuItem{tr("As needed"), Qt::ScrollBarAsNeeded},
+                 ScrollBarPolicyMenuItem{tr("Always off"), Qt::ScrollBarAlwaysOff},
+                 ScrollBarPolicyMenuItem{tr("Always on"), Qt::ScrollBarAlwaysOn},
+            }) {
+            auto scrollbar_action = scrollbar_menu->addAction(item.first);
+            scrollbar_action->setCheckable(true);
+            scrollbar_action->setChecked(viewer->view()->horizontalScrollBarPolicy() == item.second);
+            connect(scrollbar_action, &QAction::triggered, [=] {
+                viewer->view()->setHorizontalScrollBarPolicy(item.second);
+                viewer->view()->setVerticalScrollBarPolicy(item.second);
+                scrollbar_action->setChecked(true);
+            });
+            scrollbar_actions->addAction(scrollbar_action);
+        }
 
         setCentralWidget(viewer);
         resize(800, 600);

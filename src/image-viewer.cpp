@@ -78,6 +78,7 @@ ImageViewer::ImageViewer(QWidget *parent)
     m_pixmap = new PixmapItem;
     scene->addItem(m_pixmap);
     connect(m_pixmap, SIGNAL(mouseMoved(int,int)), SLOT(mouseAt(int,int)));
+    connect(m_pixmap, SIGNAL(sizeChanged(int,int)), SLOT(updateSceneRect(int,int)));
 
     makeToolbar();
 
@@ -167,6 +168,10 @@ void ImageViewer::enableAntialiasing(bool on) {
     m_view->setRenderHint(QPainter::Antialiasing, on);
 }
 
+QGraphicsView *ImageViewer::view() const {
+    return m_view;
+}
+
 void ImageViewer::addTool(QWidget *tool) {
     m_toolbar->layout()->addWidget(tool);
 }
@@ -215,6 +220,12 @@ void ImageViewer::mouseAt(int x, int y) {
     }
     else
         m_pixel_value->setText(QString());
+}
+
+void ImageViewer::updateSceneRect(int w, int h) {
+    Q_UNUSED(w);
+    Q_UNUSED(h);
+    m_view->scene()->setSceneRect(m_pixmap->boundingRect());
 }
 
 void ImageViewer::enterEvent(QEvent *event) {
