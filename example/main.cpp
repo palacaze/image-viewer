@@ -87,6 +87,9 @@ public:
             scrollbar_actions->addAction(scrollbar_action);
         }
 
+        // fit image in window on double click
+        connect(viewer->pixmapItem(), &pal::PixmapItem::doubleClicked, viewer, &pal::ImageViewer::zoomFit);
+
         setCentralWidget(viewer);
         resize(800, 600);
     }
