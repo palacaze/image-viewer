@@ -1,14 +1,15 @@
-#include "image-viewer.h"
 #include <cmath>
-#include <QGraphicsScene>
-#include <QGraphicsView>
-#include <QGraphicsSceneHoverEvent>
-#include <QWheelEvent>
 #include <QApplication>
-#include <QVBoxLayout>
+#include <QEnterEvent>
+#include <QGraphicsScene>
+#include <QGraphicsSceneHoverEvent>
+#include <QGraphicsView>
 #include <QHBoxLayout>
-#include <QToolButton>
 #include <QLabel>
+#include <QToolButton>
+#include <QVBoxLayout>
+#include <QWheelEvent>
+#include "image-viewer.h"
 
 namespace pal {
 
@@ -217,8 +218,11 @@ void ImageViewer::mouseAt(int x, int y) {
     if (m_pixmap->image().valid(x,y)) {
         QRgb rgb = m_pixmap->image().pixel(x, y);
         auto s = QStringLiteral("[%1, %2] (%3, %4, %5)")
-                    .arg(x).arg(y)
-                    .arg(qRed(rgb)).arg(qGreen(rgb)).arg(qBlue(rgb));
+                    .arg(x)
+                    .arg(y)
+                    .arg(qRed(rgb))
+                    .arg(qGreen(rgb))
+                    .arg(qBlue(rgb));
         m_pixel_value->setText(s);
     }
     else
@@ -271,7 +275,7 @@ PixmapItem::PixmapItem(QGraphicsItem *parent) :
 void PixmapItem::setImage(QImage im) {
     if (im.isNull()) {
         m_image.fill(Qt::white);
-        im=m_image.copy();
+        im = m_image.copy();
     }
     std::swap(m_image, im);
 
