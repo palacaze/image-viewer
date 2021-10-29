@@ -34,10 +34,12 @@ public:
 
 protected:
     void wheelEvent(QWheelEvent *event) override {
+        const auto d = event->angleDelta();
+
         if (event->modifiers() == Qt::NoModifier) {
-            if (event->delta() > 0)
+            if (d.x() > 0 || d.y() > 0)
                 m_viewer->zoomIn(3);
-            else if (event->delta() < 0)
+            else if (d.x() < 0 || d.y() < 0)
                 m_viewer->zoomOut(3);
             event->accept();
         }
@@ -179,18 +181,18 @@ void ImageViewer::addTool(QWidget *tool) {
 void ImageViewer::setMatrix() {
     qreal scale = std::pow(2.0, m_zoom_level / 10.0);
 
-    QMatrix matrix;
-    matrix.scale(scale, scale);
+    QTransform mat;
+    mat.scale(scale, scale);
 
-    m_view->setMatrix(matrix);
-    emit zoomChanged(m_view->matrix().m11());
+    m_view->setTransform(mat);
+    emit zoomChanged(m_view->transform().m11());
 }
 
 void ImageViewer::zoomFit() {
     m_view->fitInView(m_pixmap, Qt::KeepAspectRatio);
-    m_zoom_level = int(10.0 * std::log2(m_view->matrix().m11()));
+    m_zoom_level = int(10.0 * std::log2(m_view->transform().m11()));
     m_fit = true;
-    emit zoomChanged(m_view->matrix().m11());
+    emit zoomChanged(m_view->transform().m11());
 }
 
 void ImageViewer::zoomOriginal() {
