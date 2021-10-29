@@ -19,7 +19,7 @@ public:
     {
         // viewer
         auto viewer = new pal::ImageViewer(this);
-        viewer->setText("A test viewer");
+        viewer->setText(tr("A test viewer"));
         viewer->setToolBarMode(pal::ImageViewer::ToolBarMode::AutoHidden);
 
         // selection tool
@@ -51,11 +51,11 @@ public:
         QStringList list;
         for (auto &fmt : formats)
             list.append("*." + QString(fmt));
-        auto filter = "Images (" + list.join(" ") + ")";
+        auto filter = QStringLiteral("Images (%1)").arg(list.join(QStringLiteral(" ")));
 
         auto open_action = new QAction(tr("Open an image file..."), this);
-        connect(open_action, &QAction::triggered, [=] {
-            QString path = QFileDialog::getOpenFileName(nullptr, "Pick an image file",
+        connect(open_action, &QAction::triggered, this, [=] {
+            QString path = QFileDialog::getOpenFileName(nullptr, tr("Pick an image file"),
                                                         nullptr, filter);
             if (path.isEmpty())
                 return;
@@ -78,7 +78,7 @@ public:
             auto scrollbar_action = scrollbar_menu->addAction(item.first);
             scrollbar_action->setCheckable(true);
             scrollbar_action->setChecked(viewer->view()->horizontalScrollBarPolicy() == item.second);
-            connect(scrollbar_action, &QAction::triggered, [=] {
+            connect(scrollbar_action, &QAction::triggered, this, [=] {
                 viewer->view()->setHorizontalScrollBarPolicy(item.second);
                 viewer->view()->setVerticalScrollBarPolicy(item.second);
                 scrollbar_action->setChecked(true);
@@ -90,7 +90,7 @@ public:
         resize(800, 600);
     }
 
-    ~MainWindow() = default;
+    ~MainWindow() override = default;
 };
 
 

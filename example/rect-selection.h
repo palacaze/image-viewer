@@ -57,8 +57,8 @@ class SelectionItem : public QGraphicsObject {
         void setVisible(bool);
 
     public:
-        virtual QRectF boundingRect() const;
-        virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *);
+        QRectF boundingRect() const  override;
+        void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) override;
 
     private slots:
         void updateSelection(int);
@@ -109,11 +109,11 @@ signals:
     void moved(double pos);
 
 protected:
-    virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
-    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
-    virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+    void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
+    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
 private:
     Qt::Orientation m_orientation;

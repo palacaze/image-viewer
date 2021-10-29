@@ -93,7 +93,7 @@ ImageViewer::ImageViewer(QWidget *parent)
 void ImageViewer::makeToolbar() {
     // text and value at pixel
     m_text_label = new QLabel(this);
-    m_text_label->setStyleSheet(QString("QLabel { font-weight: bold; }"));
+    m_text_label->setStyleSheet(QStringLiteral("QLabel { font-weight: bold; }"));
     m_pixel_value = new QLabel(this);
 
     auto fit = new QToolButton(this);
@@ -214,7 +214,8 @@ void ImageViewer::zoomOut(int level) {
 void ImageViewer::mouseAt(int x, int y) {
     if (m_pixmap->image().valid(x,y)) {
         QRgb rgb = m_pixmap->image().pixel(x, y);
-        auto s = QString("[%1, %2] (%3, %4, %5)").arg(x).arg(y)
+        auto s = QStringLiteral("[%1, %2] (%3, %4, %5)")
+                    .arg(x).arg(y)
                     .arg(qRed(rgb)).arg(qGreen(rgb)).arg(qBlue(rgb));
         m_pixel_value->setText(s);
     }
@@ -223,8 +224,8 @@ void ImageViewer::mouseAt(int x, int y) {
 }
 
 void ImageViewer::updateSceneRect(int w, int h) {
-    Q_UNUSED(w);
-    Q_UNUSED(h);
+    Q_UNUSED(w)
+    Q_UNUSED(h)
     m_view->scene()->setSceneRect(m_pixmap->boundingRect());
 }
 
