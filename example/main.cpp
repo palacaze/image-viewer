@@ -1,3 +1,4 @@
+#include <QActionGroup>
 #include <QApplication>
 #include <QMainWindow>
 #include <QStyle>
@@ -7,7 +8,7 @@
 #include <QFileDialog>
 #include <QImageReader>
 #include <QGraphicsView>
-#include "image-viewer.h"
+#include <pal/image-viewer.h>
 #include "rect-selection.h"
 
 class MainWindow : public QMainWindow {
@@ -28,7 +29,7 @@ public:
 
         auto sel = new QToolButton(this);
         sel->setToolTip(tr("Selects a rectangle area in the image"));
-        sel->setIcon(QIcon(":/icons/image-selection.png"));
+        sel->setIcon(QIcon(":select"));
         sel->setCheckable(true);
 
         // cropping only allowed when an image is visible

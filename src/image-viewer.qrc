@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/">
-        <file>icons/zoom-fit-best.png</file>
-        <file>icons/zoom-original.png</file>
-        <file>icons/image-selection.png</file>
+        <file alias="zoom-fit">icons/zoom-fit-best.png</file>
+        <file alias="zoom-1">icons/zoom-original.png</file>
+        <file alias="select">icons/image-selection.png</file>
     </qresource>
 </RCC>

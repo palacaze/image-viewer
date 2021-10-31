@@ -9,7 +9,7 @@
 #include <QToolButton>
 #include <QVBoxLayout>
 #include <QWheelEvent>
-#include "image-viewer.h"
+#include "pal/image-viewer.h"
 
 namespace pal {
 
@@ -48,7 +48,7 @@ protected:
             QGraphicsView::wheelEvent(event);
     }
 
-    void enterEvent(QEvent *event) override {
+    void enterEvent(EnterEvent *event) override {
         QGraphicsView::enterEvent(event);
         viewport()->setCursor(Qt::CrossCursor);
     }
@@ -80,8 +80,8 @@ ImageViewer::ImageViewer(QWidget *parent)
     // graphic object holding the image buffer
     m_pixmap = new PixmapItem;
     scene->addItem(m_pixmap);
-    connect(m_pixmap, SIGNAL(mouseMoved(int,int)), SLOT(mouseAt(int,int)));
-    connect(m_pixmap, SIGNAL(sizeChanged(int,int)), SLOT(updateSceneRect(int,int)));
+    connect(m_pixmap, &PixmapItem::mouseMoved, this, &ImageViewer::mouseAt);
+    connect(m_pixmap, &PixmapItem::sizeChanged, this, &ImageViewer::updateSceneRect);
 
     makeToolbar();
 
@@ -101,13 +101,13 @@ void ImageViewer::makeToolbar() {
 
     auto fit = new QToolButton(this);
     fit->setToolTip(tr("Fit image to window"));
-    fit->setIcon(QIcon(":/icons/zoom-fit-best.png"));
-    connect(fit, SIGNAL(clicked()), SLOT(zoomFit()));
+    fit->setIcon(QIcon(":zoom-fit"));
+    connect(fit, &QToolButton::clicked, this, &ImageViewer::zoomFit);
 
     auto orig = new QToolButton(this);
     orig->setToolTip(tr("Resize image to its original size"));
-    orig->setIcon(QIcon(":/icons/zoom-original.png"));
-    connect(orig, SIGNAL(clicked()), SLOT(zoomOriginal()));
+    orig->setIcon(QIcon(":zoom-1"));
+    connect(orig, &QToolButton::clicked, this, &ImageViewer::zoomOriginal);
 
     m_toolbar = new QWidget;
     auto box = new QHBoxLayout(m_toolbar);
@@ -235,7 +235,7 @@ void ImageViewer::updateSceneRect(int w, int h) {
     m_view->scene()->setSceneRect(m_pixmap->boundingRect());
 }
 
-void ImageViewer::enterEvent(QEvent *event) {
+void ImageViewer::enterEvent(EnterEvent *event) {
     QFrame::enterEvent(event);
     if (m_bar_mode == ToolBarMode::AutoHidden) {
         m_toolbar->show();

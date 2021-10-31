@@ -4,11 +4,14 @@ add_executable(viewer-example
     rect-selection.h
 )
 
-pal_set_exe_properties(viewer-example)
+target_link_libraries(viewer-example Pal::ImageViewer)
 
-target_link_libraries(viewer-example
-    Pal::ImageViewer
-    Qt5::Gui
-    Qt5::Widgets
+set_target_properties(viewer-example PROPERTIES
+    CXX_STANDARD 11
+    CXX_STANDARD_REQUIRED YES
+    CXX_EXTENSIONS NO
+    AUTOMOC ON
+    AUTORCC ON
 )
 
+target_compile_options(viewer-example PRIVATE ${PAL_COMPILER_FLAGS})

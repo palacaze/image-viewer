@@ -1,68 +1,90 @@
-cmake_minimum_required(VERSION 3.6)
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+cmake_minimum_required(VERSION 3.12)
 
-project(pal-image-viewer VERSION 0.1 LANGUAGES CXX)
+project(PalImageViewer VERSION 0.1 LANGUAGES CXX)
 
-if(NOT DEFINED BUILD_SHARED_LIBS)
-    set(BUILD_SHARED_LIBS ON)
-endif()
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+
+####### Options #######
+
+# Allow forcing Qt version
+set(PIV_PREFERRED_QT_VERSION "" CACHE STRING "Preferred Qt major version number to use.")
 
 
-# compiler support
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED YES)
+####### Compilation Flags #######
 
 include(CheckCXXCompilerFlag)
+
 macro(pal_test_compiler_flag flag)
     string(REPLACE "-" "_" testname ${flag})
     string(TOUPPER ${testname} testname)
-    check_cxx_compiler_flag("-${flag}" ${testname})
+    check_cxx_compiler_flag("${flag}" ${testname})
     if (${testname})
-        list(APPEND PAL_COMPILER_FLAGS "-${flag}")
+        list(APPEND PIV_COMPILER_FLAGS "${flag}")
     endif()
 endmacro()
 
-pal_test_compiler_flag("Wall")
-pal_test_compiler_flag("Wextra")
-pal_test_compiler_flag("fdiagnostics-color=always")
-pal_test_compiler_flag("pipe")
+pal_test_compiler_flag("-Wall")
+pal_test_compiler_flag("-Wextra")
+pal_test_compiler_flag("-fdiagnostics-color=always")
 
-check_cxx_compiler_flag("-march=native" PAL_CHECK_MARCH_NATIVE)
-if(PAL_CHECK_MARCH_NATIVE)
-    add_compile_options($<$<CONFIG:Release>:-march=native>)
+####### Find packages #######
+
+# Attempt Qt6
+if ((NOT PIV_PREFERRED_QT_VERSION) OR (PIV_PREFERRED_QT_VERSION STREQUAL "6"))
+    find_package(Qt6 COMPONENTS Core Widgets Gui QUIET)
+    set(PIV_QT Qt${Qt6_VERSION_MAJOR})
 endif()
 
+# Or Qt5
+if ((NOT Qt6_FOUND) AND (NOT PIV_PREFERRED_QT_VERSION STREQUAL "6"))
+    find_package(Qt5 COMPONENTS Core Widgets Gui REQUIRED QUIET)
+    set(PIV_QT Qt${Qt5_VERSION_MAJOR})
+endif()
 
-# Qt
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-find_package(Qt5 5.6 COMPONENTS Core Widgets Gui REQUIRED QUIET)
+if (PIV_QT STREQUAL Qt)
+    message(FATAL_ERROR "Qt not found")
+endif()
 
-# Compile flag tweaks on every target
-function(pal_set_common_properties target)
-    target_compile_definitions(${target} PRIVATE $<$<CONFIG:Release>:NDEBUG>)
-    set_target_properties(${target} PROPERTIES CXX_EXTENSIONS NO)
-    target_compile_options(${target} PRIVATE ${PAL_COMPILER_FLAGS})
-endfunction()
-
-# custom lib properties
-function(pal_set_lib_properties target)
-    pal_set_common_properties(${target})
-
-    # handle symbol export
-    string(REPLACE "-" "_" tname ${target})
-    string(TOUPPER ${tname} tname)
-    if(BUILD_SHARED_LIBS)
-        target_compile_definitions(${target} PRIVATE "${tname}_SHARED_LIBRARY")
-    endif()
-    target_compile_definitions(${target} PRIVATE "${tname}_BUILD_LIBRARY")
-endfunction()
-
-# custom app properties
-function(pal_set_exe_properties target)
-    pal_set_common_properties(${target})
-endfunction()
+####### Targets #######
 
 add_subdirectory(src)
 add_subdirectory(example)
 
+
+####### Package Installation #######
+
+install(
+    EXPORT PalImageViewerTargets
+    FILE PalImageViewerTargets.cmake
+    NAMESPACE Pal::
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/PalImageViewer"
+    COMPONENT PalImageViewerDevel
+)
+
+# Setup Qt dependency check
+set(PIV_QT_DEPENDENCY "${PIV_QT} COMPONENTS Core Gui Widgets")
+configure_package_config_file(
+    "${PROJECT_SOURCE_DIR}/PalImageViewerConfig.cmake.in"
+    "${PROJECT_BINARY_DIR}/PalImageViewerConfig.cmake"
+    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/PalImageViewer"
+)
+
+write_basic_package_version_file(
+    "${PROJECT_BINARY_DIR}/PalImageViewerConfigVersion.cmake"
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY ExactVersion
+)
+
+install(
+    FILES "${PROJECT_BINARY_DIR}/PalImageViewerConfig.cmake"
+          "${PROJECT_BINARY_DIR}/PalImageViewerConfigVersion.cmake"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/PalImageViewer"
+    COMPONENT PalImageViewerDevel
+)
+
+export(
+    TARGETS ImageViewer
+    NAMESPACE Pal::
+    FILE PalImageViewerTargets.cmake
+)

@@ -1,0 +1,9 @@
+set(PalImageViewer_VERSION @PROJECT_VERSION@)
+
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+find_dependency(@PIV_QT_DEPENDENCY@ REQUIRED)
+
+include("${CMAKE_CURRENT_LIST_DIR}/PalImageViewerTargets.cmake")
+

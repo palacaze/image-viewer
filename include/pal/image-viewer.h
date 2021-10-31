@@ -1,9 +1,9 @@
-#ifndef IMAGEVIEWER_H
-#define IMAGEVIEWER_H
+#ifndef PAL_IMAGE_VIEWER_H
+#define PAL_IMAGE_VIEWER_H
 
 #include <QFrame>
 #include <QGraphicsPixmapItem>
-#include "image-viewer-global.h"
+#include <pal/image-viewer-export.h>
 
 QT_BEGIN_NAMESPACE
 class QGraphicsView;
@@ -15,10 +15,18 @@ namespace pal {
 class PixmapItem;
 class GraphicsView;
 
+// 5 -> 6 transition
+#if QT_VERSION_MAJOR > 5
+using EnterEvent = QEnterEvent;
+#else
+using EnterEvent = QEvent;
+#endif
+
+
 /**
  * @brief ImageViewer displays images and allows basic interaction with it
  */
-class IMAGE_VIEWER_PUBLIC ImageViewer : public QFrame {
+class PAL_IMAGE_VIEWER_EXPORT ImageViewer : public QFrame {
     Q_OBJECT
 
 public:
@@ -76,7 +84,7 @@ signals:
     void zoomChanged(double scale);
 
 protected:
-    void enterEvent(QEvent *event) override;
+    void enterEvent(EnterEvent *event) override;
     void leaveEvent(QEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
     void showEvent(QShowEvent *event) override;
@@ -97,7 +105,7 @@ private:
 };
 
 
-class IMAGE_VIEWER_PUBLIC PixmapItem : public QObject, public QGraphicsPixmapItem {
+class PAL_IMAGE_VIEWER_EXPORT PixmapItem : public QObject, public QGraphicsPixmapItem {
     Q_OBJECT
 
 public:
@@ -123,4 +131,4 @@ private:
 
 } // namespace pal
 
-#endif // IMAGEVIEWER_H
+#endif // PAL_IMAGE_VIEWER_H
