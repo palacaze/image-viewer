@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 
-project(PalImageViewer VERSION 0.1 LANGUAGES CXX)
+project(PalImageViewer VERSION 0.2 LANGUAGES CXX)
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
