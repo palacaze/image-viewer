@@ -1,3 +1,4 @@
+#define _USE_MATH_DEFINES
 #include <cmath>
 #include <mutex>
 #include <QApplication>
@@ -188,21 +189,42 @@ void ImageViewer::addTool(QWidget *tool) {
     m_toolbar->layout()->addWidget(tool);
 }
 
+qreal ImageViewer::rotation() const {
+    return 180. * rotationRadians() / M_PI;
+}
+
+qreal ImageViewer::rotationRadians() const {
+    auto p10 = m_view->transform().map(QPointF(1., 0.));
+    return std::atan2(p10.y(), p10.x());
+}
+
+void ImageViewer::setRotation(qreal angle) {
+    m_view->rotate(angle - rotation());
+    if (m_fit)
+        zoomFit();
+}
+
+qreal ImageViewer::scale() const {
+    auto square = [](qreal value) { return value * value; };
+    return std::sqrt(square(m_view->transform().m11()) + square(m_view->transform().m12()));
+}
+
 void ImageViewer::setMatrix() {
-    qreal scale = std::pow(2.0, m_zoom_level / 10.0);
+    qreal newScale = std::pow(2.0, m_zoom_level / 10.0);
 
     QTransform mat;
-    mat.scale(scale, scale);
+    mat.scale(newScale, newScale);
+    mat.rotateRadians(rotationRadians());
 
     m_view->setTransform(mat);
-    emit zoomChanged(m_view->transform().m11());
+    emit zoomChanged(scale());
 }
 
 void ImageViewer::zoomFit() {
     m_view->fitInView(m_pixmap, Qt::KeepAspectRatio);
-    m_zoom_level = int(10.0 * std::log2(m_view->transform().m11()));
+    m_zoom_level = int(10.0 * std::log2(scale()));
     m_fit = true;
-    emit zoomChanged(m_view->transform().m11());
+    emit zoomChanged(scale());
 }
 
 void ImageViewer::zoomOriginal() {

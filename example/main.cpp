@@ -8,6 +8,7 @@
 #include <QFileDialog>
 #include <QImageReader>
 #include <QGraphicsView>
+#include <QPropertyAnimation>
 #include <pal/image-viewer.h>
 #include "rect-selection.h"
 
@@ -89,6 +90,24 @@ public:
 
         // fit image in window on double click
         connect(viewer->pixmapItem(), &pal::PixmapItem::doubleClicked, viewer, &pal::ImageViewer::zoomFit);
+
+        auto rotateAnimation = new QPropertyAnimation (viewer, "rotation", this);
+        rotateAnimation->setDuration(125);
+
+        auto rotateView = [=](qreal angle) {
+            rotateAnimation->setStartValue(viewer->rotation());
+            rotateAnimation->setEndValue(viewer->rotation() + angle);
+            rotateAnimation->start();
+        };
+
+        auto rotate_left_action = menuBar()->addAction(tr("Rotate &left"));
+        connect(rotate_left_action, &QAction::triggered, [=] { rotateView(-90); });
+
+        auto rotate_right_action = menuBar()->addAction(tr("Rotate &right"));
+        connect(rotate_right_action, &QAction::triggered, [=] { rotateView(90); });
+
+        auto reset_rotation_action = menuBar()->addAction(tr("Reset rotation"));
+        connect(reset_rotation_action, &QAction::triggered, [=] { viewer->setRotation(0.); });
 
         setCentralWidget(viewer);
         resize(800, 600);

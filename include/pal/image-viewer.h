@@ -29,6 +29,8 @@ using EnterEvent = QEvent;
 class PAL_IMAGE_VIEWER_EXPORT ImageViewer : public QFrame {
     Q_OBJECT
 
+    Q_PROPERTY(qreal rotation READ rotation WRITE setRotation)
+
 public:
     /**
      * ToolBar visibility
@@ -66,9 +68,13 @@ public:
     /// QGraphicsView control
     QGraphicsView* view() const;
 
+    /// Get view rotation angle
+    qreal rotation() const;
+
 public slots:
     void setText(const QString &txt);
     void setImage(const QImage &);
+    void setRotation(qreal angle);
 
     void zoomFit();
     void zoomOriginal();
@@ -90,6 +96,8 @@ protected:
     void showEvent(QShowEvent *event) override;
 
 private:
+    qreal rotationRadians() const;
+    qreal scale() const;
     void setMatrix();
     void makeToolbar();
 
