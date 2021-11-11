@@ -116,11 +116,13 @@ public slots:
     void setImage(QImage im);
 
 signals:
+    void doubleClicked(int x, int y);
     void imageChanged(const QImage &);
     void sizeChanged(int w, int h);
     void mouseMoved(int x, int y);
 
 protected:
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *) override;
     void mousePressEvent(QGraphicsSceneMouseEvent *) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *) override;
     void hoverMoveEvent(QGraphicsSceneHoverEvent *) override;
