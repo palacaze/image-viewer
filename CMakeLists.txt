@@ -2,6 +2,11 @@ cmake_minimum_required(VERSION 3.12)
 
 project(PalImageViewer VERSION 0.2 LANGUAGES CXX)
 
+if (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    set(PIV_STANDALONE ON)
+    set(BUILD_SHARED_LIBS ON)
+endif()
+
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
@@ -49,42 +54,47 @@ endif()
 ####### Targets #######
 
 add_subdirectory(src)
-add_subdirectory(example)
+
+if (PIV_STANDALONE)
+    add_subdirectory(example)
+endif()
 
 
 ####### Package Installation #######
 
-install(
-    EXPORT PalImageViewerTargets
-    FILE PalImageViewerTargets.cmake
-    NAMESPACE Pal::
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/PalImageViewer"
-    COMPONENT PalImageViewerDevel
-)
+if (PIV_STANDALONE)
+    install(
+        EXPORT PalImageViewerTargets
+        FILE PalImageViewerTargets.cmake
+        NAMESPACE Pal::
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/PalImageViewer"
+        COMPONENT PalImageViewerDevel
+     )
 
-# Setup Qt dependency check
-set(PIV_QT_DEPENDENCY "${PIV_QT} COMPONENTS Core Gui Widgets")
-configure_package_config_file(
-    "${PROJECT_SOURCE_DIR}/PalImageViewerConfig.cmake.in"
-    "${PROJECT_BINARY_DIR}/PalImageViewerConfig.cmake"
-    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/PalImageViewer"
-)
+    # Setup Qt dependency check
+    set(PIV_QT_DEPENDENCY "${PIV_QT} COMPONENTS Core Gui Widgets")
+    configure_package_config_file(
+        "${PROJECT_SOURCE_DIR}/PalImageViewerConfig.cmake.in"
+        "${PROJECT_BINARY_DIR}/PalImageViewerConfig.cmake"
+        INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/PalImageViewer"
+    )
 
-write_basic_package_version_file(
-    "${PROJECT_BINARY_DIR}/PalImageViewerConfigVersion.cmake"
-    VERSION ${PROJECT_VERSION}
-    COMPATIBILITY ExactVersion
-)
+    write_basic_package_version_file(
+        "${PROJECT_BINARY_DIR}/PalImageViewerConfigVersion.cmake"
+        VERSION ${PROJECT_VERSION}
+        COMPATIBILITY ExactVersion
+    )
 
-install(
-    FILES "${PROJECT_BINARY_DIR}/PalImageViewerConfig.cmake"
-          "${PROJECT_BINARY_DIR}/PalImageViewerConfigVersion.cmake"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/PalImageViewer"
-    COMPONENT PalImageViewerDevel
-)
+    install(
+        FILES "${PROJECT_BINARY_DIR}/PalImageViewerConfig.cmake"
+              "${PROJECT_BINARY_DIR}/PalImageViewerConfigVersion.cmake"
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/PalImageViewer"
+        COMPONENT PalImageViewerDevel
+    )
 
-export(
-    TARGETS ImageViewer
-    NAMESPACE Pal::
-    FILE PalImageViewerTargets.cmake
-)
+    export(
+        TARGETS ImageViewer
+        NAMESPACE Pal::
+        FILE PalImageViewerTargets.cmake
+    )
+endif()

@@ -1,6 +1,6 @@
 ####### Library #######
 
-add_library(ImageViewer SHARED
+add_library(ImageViewer
     ${PROJECT_BINARY_DIR}/include/pal/image-viewer-export.h
     ${PROJECT_SOURCE_DIR}/include/pal/image-viewer.h
     image-viewer.cpp
@@ -43,24 +43,26 @@ target_link_libraries(ImageViewer
 
 ####### Library installation #######
 
-install(
-    TARGETS ImageViewer
-    EXPORT PalImageViewerTargets
-    RUNTIME
-        DESTINATION "${CMAKE_INSTALL_BINDIR}"
-        COMPONENT PalImageViewerRuntime
-    LIBRARY
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-        COMPONENT PalImageViewerRuntime
-        NAMELINK_COMPONENT PalImageViewerDevel
-    ARCHIVE
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-        COMPONENT PalImageViewerDevel
-)
+if (PIV_STANDALONE)
+    install(
+        TARGETS ImageViewer
+        EXPORT PalImageViewerTargets
+        RUNTIME
+            DESTINATION "${CMAKE_INSTALL_BINDIR}"
+            COMPONENT PalImageViewerRuntime
+        LIBRARY
+            DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+            COMPONENT PalImageViewerRuntime
+            NAMELINK_COMPONENT PalImageViewerDevel
+        ARCHIVE
+            DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+            COMPONENT PalImageViewerDevel
+    )
 
-install(
-    FILES ${PROJECT_BINARY_DIR}/include/pal/image-viewer-export.h
-          ${PROJECT_SOURCE_DIR}/include/pal/image-viewer.h
-    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/pal"
-    COMPONENT PalImageViewerDevel
-)
+    install(
+        FILES ${PROJECT_BINARY_DIR}/include/pal/image-viewer-export.h
+              ${PROJECT_SOURCE_DIR}/include/pal/image-viewer.h
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/pal"
+        COMPONENT PalImageViewerDevel
+    )
+endif()

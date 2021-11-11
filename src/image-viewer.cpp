@@ -1,4 +1,5 @@
 #include <cmath>
+#include <mutex>
 #include <QApplication>
 #include <QEnterEvent>
 #include <QGraphicsScene>
@@ -11,6 +12,11 @@
 #include <QWheelEvent>
 #include "pal/image-viewer.h"
 
+static void init_image_viewer_resource() {
+    // This must be done outside of any namespace
+    Q_INIT_RESOURCE(image_viewer);
+}
+
 namespace pal {
 
 // Graphics View with better mouse events handling
@@ -21,6 +27,9 @@ public:
         : QGraphicsView()
         , m_viewer(viewer)
     {
+        static std::once_flag inititialized;
+        std::call_once(inititialized, init_image_viewer_resource);
+
         // no antialiasing or filtering, we want to see the exact image content
         setRenderHint(QPainter::Antialiasing, false);
         setDragMode(QGraphicsView::ScrollHandDrag);
