@@ -116,7 +116,7 @@ public slots:
     void setImage(QImage im);
 
 signals:
-    void doubleClicked();
+    void doubleClicked(int x, int y);
     void imageChanged(const QImage &);
     void sizeChanged(int w, int h);
     void mouseMoved(int x, int y);

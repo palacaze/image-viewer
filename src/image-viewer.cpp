@@ -288,7 +288,8 @@ void PixmapItem::setImage(QImage im) {
 }
 
 void PixmapItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) {
-    emit doubleClicked();
+    auto pos = event->pos();
+    emit doubleClicked(int(pos.x()), int(pos.y()));
     QGraphicsItem::mouseDoubleClickEvent(event);
 }
 
