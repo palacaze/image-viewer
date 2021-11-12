@@ -71,10 +71,18 @@ public:
     /// Get view rotation angle
     qreal rotation() const;
 
+    /// Get aspect ratio mode
+    Qt::AspectRatioMode aspectRatioMode() const;
+
 public slots:
     void setText(const QString &txt);
     void setImage(const QImage &);
     void setRotation(qreal angle);
+    /*
+     * Set aspect ratio mode.
+     * Currently, only Qt::KeepAspectRatio and Qt::KeepAspectRatioByExpanding are supported
+     */
+    void setAspectRatioMode(Qt::AspectRatioMode aspect_ratio_mode);
 
     void zoomFit();
     void zoomOriginal();
@@ -110,6 +118,7 @@ private:
     QWidget *m_toolbar;
     bool m_fit;
     ToolBarMode m_bar_mode;
+    Qt::AspectRatioMode m_aspect_ratio_mode;
 };
 
 

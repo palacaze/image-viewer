@@ -109,6 +109,25 @@ public:
         auto reset_rotation_action = menuBar()->addAction(tr("Reset rotation"));
         connect(reset_rotation_action, &QAction::triggered, [=] { viewer->setRotation(0.); });
 
+        auto aspect_ratio_actions = new QActionGroup(this);
+        aspect_ratio_actions->setExclusive(true);
+
+        auto aspect_ratio_menu = menuBar()->addMenu(tr("&Aspect ratio"));
+        using AspectRatioMenuItem = std::pair<QString, Qt::AspectRatioMode>;
+        for (auto item : {
+                 AspectRatioMenuItem{tr("Keep"), Qt::KeepAspectRatio},
+                 AspectRatioMenuItem{tr("Keep by expanding"), Qt::KeepAspectRatioByExpanding},
+            }) {
+            auto action = aspect_ratio_menu->addAction(item.first);
+            action->setCheckable(true);
+            action->setChecked(viewer->aspectRatioMode() == item.second);
+            connect(action, &QAction::triggered, this, [=] {
+                viewer->setAspectRatioMode(item.second);
+                action->setChecked(true);
+            });
+            aspect_ratio_actions->addAction(action);
+        }
+
         setCentralWidget(viewer);
         resize(800, 600);
     }

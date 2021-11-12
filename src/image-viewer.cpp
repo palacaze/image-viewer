@@ -8,6 +8,7 @@
 #include <QGraphicsView>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QScrollBar>
 #include <QToolButton>
 #include <QVBoxLayout>
 #include <QWheelEvent>
@@ -82,6 +83,7 @@ ImageViewer::ImageViewer(QWidget *parent)
     , m_zoom_level(0)
     , m_fit(true)
     , m_bar_mode(ToolBarMode::Visible)
+    , m_aspect_ratio_mode(Qt::KeepAspectRatio)
 {
     auto scene = new QGraphicsScene(this);
     m_view = new GraphicsView(this);
@@ -151,6 +153,12 @@ void ImageViewer::setImage(const QImage &im) {
     emit imageChanged();
 }
 
+void ImageViewer::setAspectRatioMode(Qt::AspectRatioMode aspect_ratio_mode) {
+    m_aspect_ratio_mode = aspect_ratio_mode;
+    if (m_fit)
+        zoomFit();
+}
+
 const PixmapItem *ImageViewer::pixmapItem() const {
     return m_pixmap;
 }
@@ -189,6 +197,10 @@ void ImageViewer::addTool(QWidget *tool) {
     m_toolbar->layout()->addWidget(tool);
 }
 
+Qt::AspectRatioMode ImageViewer::aspectRatioMode() const {
+    return m_aspect_ratio_mode;
+}
+
 qreal ImageViewer::rotation() const {
     return 180. * rotationRadians() / M_PI;
 }
@@ -221,7 +233,7 @@ void ImageViewer::setMatrix() {
 }
 
 void ImageViewer::zoomFit() {
-    m_view->fitInView(m_pixmap, Qt::KeepAspectRatio);
+    m_view->fitInView(m_pixmap, m_aspect_ratio_mode);
     m_zoom_level = int(10.0 * std::log2(scale()));
     m_fit = true;
     emit zoomChanged(scale());
@@ -286,8 +298,17 @@ void ImageViewer::leaveEvent(QEvent *event) {
 
 void ImageViewer::resizeEvent(QResizeEvent *event) {
     QFrame::resizeEvent(event);
-    if (m_fit)
+    if (m_fit) {
+        int hpos = m_view->horizontalScrollBar()->value();
+        int vpos = m_view->verticalScrollBar()->value();
         zoomFit();
+        if (m_aspect_ratio_mode == Qt::KeepAspectRatioByExpanding) {
+            // adjust scrollbar positions to keep viewport center
+            auto adj = QSize(event->size() - event->oldSize()) / 2;
+            m_view->horizontalScrollBar()->setValue(hpos - adj.width());
+            m_view->verticalScrollBar()->setValue(vpos - adj.height());
+        }
+    }
 }
 
 void ImageViewer::showEvent(QShowEvent *event) {
