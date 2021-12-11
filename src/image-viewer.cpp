@@ -233,9 +233,22 @@ void ImageViewer::setMatrix() {
 }
 
 void ImageViewer::zoomFit() {
+    /* Fit in view by KeepAspectRatioByExpanding does not keep the position
+     * find out the current viewport center move back to that position after
+     * fitting. It is done here instead of inside the resize event handler
+     * because fitInView may be triggered from a number of events, not just
+     * the resize event.
+     */
+    auto cr = QRect(m_view->viewport()->rect().center(), QSize(2, 2));
+    auto cen = m_view->mapToScene(cr).boundingRect().center();
+
     m_view->fitInView(m_pixmap, m_aspect_ratio_mode);
     m_zoom_level = int(10.0 * std::log2(scale()));
     m_fit = true;
+
+    if (m_aspect_ratio_mode == Qt::KeepAspectRatioByExpanding)
+        m_view->centerOn(cen);
+
     emit zoomChanged(scale());
 }
 
@@ -298,17 +311,8 @@ void ImageViewer::leaveEvent(QEvent *event) {
 
 void ImageViewer::resizeEvent(QResizeEvent *event) {
     QFrame::resizeEvent(event);
-    if (m_fit) {
-        int hpos = m_view->horizontalScrollBar()->value();
-        int vpos = m_view->verticalScrollBar()->value();
+    if (m_fit)
         zoomFit();
-        if (m_aspect_ratio_mode == Qt::KeepAspectRatioByExpanding) {
-            // adjust scrollbar positions to keep viewport center
-            auto adj = QSize(event->size() - event->oldSize()) / 2;
-            m_view->horizontalScrollBar()->setValue(hpos - adj.width());
-            m_view->verticalScrollBar()->setValue(vpos - adj.height());
-        }
-    }
 }
 
 void ImageViewer::showEvent(QShowEvent *event) {
