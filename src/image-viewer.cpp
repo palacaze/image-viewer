@@ -49,9 +49,10 @@ protected:
         const auto d = event->angleDelta();
 
         if (event->modifiers() == Qt::NoModifier) {
-            if (d.x() > 0 || d.y() > 0)
+            auto dm = abs(d.x()) > abs(d.y()) ? d.x() : d.y();
+            if (dm > 0)
                 m_viewer->zoomIn(3);
-            else if (d.x() < 0 || d.y() < 0)
+            else if (dm < 0)
                 m_viewer->zoomOut(3);
             event->accept();
         }
