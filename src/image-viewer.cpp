@@ -215,6 +215,8 @@ void ImageViewer::setRotation(qreal angle) {
     m_view->rotate(angle - rotation());
     if (m_fit)
         zoomFit();
+
+    emit rotationChanged(rotation());
 }
 
 qreal ImageViewer::scale() const {
