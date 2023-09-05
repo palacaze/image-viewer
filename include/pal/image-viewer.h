@@ -29,7 +29,7 @@ using EnterEvent = QEvent;
 class PAL_IMAGE_VIEWER_EXPORT ImageViewer : public QFrame {
     Q_OBJECT
 
-    Q_PROPERTY(qreal rotation READ rotation WRITE setRotation)
+    Q_PROPERTY(qreal rotation READ rotation WRITE setRotation NOTIFY rotationChanged)
 
 public:
     /**
@@ -95,6 +95,7 @@ private slots:
 
 signals:
     void imageChanged();
+    void rotationChanged(double rotation);
     void zoomChanged(double scale);
 
 protected:
